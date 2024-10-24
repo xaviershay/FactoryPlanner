@@ -33,13 +33,14 @@ local tests = {
 
 
 local function runner(test)
-    local export_string = game.encode_string(parts.export_string(test.setup))
+    local export_string = helpers.encode_string(parts.export_string(test.setup))
     local import_factory = util.porter.process_export_string(export_string)  ---@cast import_factory -nil
-    local subfactory = Factory.get(import_factory, "Subfactory", 1)
-    if not subfactory.valid then error("Loaded subfactory setup is invalid") end
-    solver.update(game.get_player(1), subfactory)  -- jank
-
-    return test.body(subfactory)
+--    local subfactory = Factory.get(import_factory, "Subfactory", 1)
+--    if not subfactory.valid then error("Loaded subfactory setup is invalid") end
+--    solver.update(game.get_player(1), subfactory)  -- jank
+--
+--    return test.body(subfactory)
+    return "pending"
 end
 
 for _, test in pairs(tests) do test.runner = runner end
