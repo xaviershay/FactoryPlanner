@@ -11,38 +11,50 @@ local District= require("__factoryplanner__.backend.data.District")
 local Product = require("__factoryplanner__.backend.data.Product")
 local Line = require("__factoryplanner__.backend.data.Line")
 
-local function fixture_factory(name)
-    local f = Factory.init("Test 1")
-    -- A district is necessary for a location/pollutant_type
-    f.parent = District.init("Test District")
-    return f
+-- Proof of concept builder object. Needs to be moved to a new file, documented, etc...
+FactoryBuilder = {}
+
+function FactoryBuilder:new (o)
+    o = o or {}   -- create object if user does not provide one
+    setmetatable(o, self)
+    self.__index = self
+    return o
 end
 
-local function fixture_set_goal(factory, item, amount)
+function FactoryBuilder:set_goal(item, amount)
     local proto = prototyper.util.find("items", item, "item")
     -- See picker_dialog#close_picker_dialog
     local goal = Product.init(proto)
     goal.required_amount = amount
-    factory:insert(goal)
+    self.factory:insert(goal)
 end
 
-local function fixture_add_recipe(factory, player, recipe)
+function FactoryBuilder:add_recipe(recipe)
     local recipe_proto = prototyper.util.find("recipes", "iron-plate", nil)
     local line = Line.init(recipe_proto, "produce")
-    line:change_machine_to_default(player)
-    factory.top_floor:insert(line)
+    line:change_machine_to_default(self.player)
+    self.factory.top_floor:insert(line)
+end
+
+function builder(player, name)
+    local f = Factory.init(name)
+    -- A district is necessary for a location/pollutant_type
+    f.parent = District.init("Test District")
+
+    return FactoryBuilder:new {
+        player = player,
+        factory = f,
+    }
 end
 
 local tests = {
     {
         name = "example_subfactory",
         builder = (function(player)
-            local f = fixture_factory("Test 1")
-
-            fixture_set_goal(f, "iron-plate", 10)
-            fixture_add_recipe(f, player, "iron-plate")
-
-            return f
+            local f = builder(player, "Test 1")
+            f:set_goal("iron-plate", 10)
+            f:add_recipe("iron-plate")
+            return f.factory
         end),
         body = (function(subfactory)
             -- TODO: This is all very temporary proof-of-concept
