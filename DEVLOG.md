@@ -44,6 +44,16 @@ those to the test subfactory lets us remove hacks.
 Added print to control.lua so that results are printed to console as well as file.
 Pretty sure the code to dump errors to results.txt is broken, but don't care at this point.
 
+PROBLEM: Still have some commented code in the main modfiles that need to be reverted before merge is possible.
+
+Files are being double-required. First by the scenario `control.lua`, second by
+the mod `control.lua`. This causes problems when e.g. adding an interface in
+`screenshotter.lua`
+
+Really wanted to avoid changing main modfiles, but think need to make them
+idempotent by removing commands first. Otherwise need to do a lot of work in
+test harness to sort out requires.
+
 ## 2024-10-24, Xavier
 
 GOAL: Set up devenv.
