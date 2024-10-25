@@ -25,6 +25,7 @@ local function teardown()
     local failures = ""
 
     for name, result in pairs(storage.results) do
+        print(result)
         if result ~= "pass" then failures = failures .. "\nTest " .. name .. ": " .. result end
     end
 
